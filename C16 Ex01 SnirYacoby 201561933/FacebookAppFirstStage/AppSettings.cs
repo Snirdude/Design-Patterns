@@ -46,6 +46,10 @@ namespace FacebookAppFirstStage
                     settings = serialzer.Deserialize(stream) as AppSettings;
                 }
             }
+            else
+            {
+                settings = new AppSettings();
+            }
 
             return settings;
         }

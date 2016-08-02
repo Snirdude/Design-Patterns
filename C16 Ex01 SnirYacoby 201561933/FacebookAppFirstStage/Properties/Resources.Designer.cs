@@ -59,5 +59,15 @@ namespace FacebookAppFirstStage.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Facebook_create {
+            get {
+                object obj = ResourceManager.GetObject("Facebook-create", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
     }
 }
