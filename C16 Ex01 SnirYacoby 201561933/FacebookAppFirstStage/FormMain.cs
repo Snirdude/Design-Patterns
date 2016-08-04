@@ -10,6 +10,9 @@ using System.Windows.Forms;
 using FacebookWrapper;
 using FacebookWrapper.ObjectModel;
 using System.Threading;
+using GMap.NET.WindowsForms;
+using GMap.NET;
+using GMap.NET.WindowsForms.Markers;
 
 namespace FacebookAppFirstStage
 {
@@ -29,6 +32,9 @@ namespace FacebookAppFirstStage
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
+            gMapControlFriendCheckins.MapProvider = GMap.NET.MapProviders.GoogleMapProvider.Instance;
+            GMaps.Instance.Mode = AccessMode.ServerOnly;
+            gMapControlFriendCheckins.SetPositionByKeywords("Tel-Aviv, Israel");
             m_AppSettings = AppSettings.LoadFromFile();
             if (m_AppSettings.IsChecked)
             {
@@ -66,14 +72,16 @@ namespace FacebookAppFirstStage
             checkBoxRememberMe.Enabled = true;
             Task.Factory.StartNew(() =>
             {
-                List<string> friends = fetchFriends();
+                List<string> friends = fetchFriendsNames();
 
                 m_SynchronizationContext.Send(o =>
                 {
-                    foreach(string friendName in friends)
+                    checkedListBoxUsers.Items.Add(m_LoggedInUser.Name);
+                    foreach (string friendName in friends)
                     {
-                        comboBoxChooseFriend.Items.Add(friendName);
+                        checkedListBoxUsers.Items.Add(friendName);
                     }
+
                 }, null);
             });
 
@@ -87,7 +95,7 @@ namespace FacebookAppFirstStage
             }
         }
 
-        private List<string> fetchFriends()
+        private List<string> fetchFriendsNames()
         {
             List<string> list = new List<string>();
 
@@ -101,7 +109,7 @@ namespace FacebookAppFirstStage
 
         private void buttonLogin_Click(object sender, EventArgs e)
         {
-            LoginResult result = FacebookService.Login("220724224990682", "public_profile", "user_friends", "user_posts", "user_photos", "user_likes");
+            LoginResult result = FacebookService.Login("220724224990682", "public_profile", "user_friends", "user_posts", "user_photos", "user_likes", "user_events", "publish_actions", "user_location");
             m_AppSettings.AccessToken = result.AccessToken;
             doWhenLogin(result);
         }
@@ -120,11 +128,9 @@ namespace FacebookAppFirstStage
             buttonLogout.Enabled = false;
             checkBoxRememberMe.Enabled = false;
             pictureBoxProfile.Image = null;
-            listViewMostActiveFriends.Clear();
+            listViewMostActiveFriends.Items.Clear();
             listBoxFriends.Items.Clear();
-            listBoxPicturesWithFriend.Items.Clear();
-            comboBoxChooseFriend.Items.Clear();
-            comboBoxChooseFriend.Text = "";
+            checkedListBoxUsers.Items.Clear();
             checkBoxRememberMe.Checked = false;
         }
 
@@ -135,7 +141,7 @@ namespace FacebookAppFirstStage
 
         private void buttonGetFriends_Click(object sender, EventArgs e)
         {
-            List<string> friendList = fetchFriends();
+            List<string> friendList = fetchFriendsNames();
 
             listBoxFriends.Items.Clear();
             foreach(string friend in friendList)
@@ -151,291 +157,125 @@ namespace FacebookAppFirstStage
 
             Task.Factory.StartNew(() =>
             {
-                List<string> friendList = fetchFriends();
-                List<Post> postList = fetchPosts();
-                Dictionary<Post, List<string>> eachPostLikedBy = fetchPostsLikedByUsers(postList);
-                Dictionary<Post, List<Comment>> eachPostCommentsFromList = fetchPostsComments(postList);
-                Dictionary<Post, List<string>> eachPostTaggedInUsers = fetchPostsTaggedUsers(postList);
-                Dictionary<string, double> activityList = new Dictionary<string, double>();
-                List<Status> statuses = m_LoggedInUser.Statuses.ToList();
-                double totalLikes = 0;
+                IEnumerable<Post> postList = fetchPosts();
+                FacebookObjectCollection<Link> links = m_LoggedInUser.PostedLinks;
+                FacebookObjectCollection<Checkin> checkins = m_LoggedInUser.Checkins;
+                FacebookObjectCollection<Status> statuses = m_LoggedInUser.Statuses;
+                FacebookScoreCalculator calculator = new FacebookScoreCalculator(m_LoggedInUser.Name);
+                double postScore = (double)numericUpDownPostScore.Value;
+                double likeScore = (double)numericUpDownLikeScore.Value;
+                double commentScore = (double)numericUpDownCommentScore.Value;
+                double statusScore = (double)numericUpDownStatusScore.Value;
+                double taggedUsersScore = (double)numericUpDownTaggedUsersScore.Value;
 
                 foreach (Post post in postList)
                 {
-                    totalLikes += calculatePostFromUserScore(activityList, post);
-                    totalLikes += calculatePostLikesScore(activityList, eachPostLikedBy[post]);
-                    totalLikes += calculateCommentsScore(activityList, eachPostCommentsFromList[post]);
-                    totalLikes += calculatePostTaggedScore(activityList, eachPostTaggedInUsers[post]);
+                    calculator.CalculatePostFromUserScore(post, postScore);
+                    calculator.CalculateLikesScore(post.LikedBy, likeScore);
+                    calculator.CalculateCommentsScore(post.Comments, commentScore);
+                    calculator.CalculateTaggedUsersScores(post.WithUsers, taggedUsersScore);
                 }
 
-                foreach(Status status in statuses)
+                calculator.CalculateStatusesScore(statuses, statusScore);
+
+                foreach(Link link in links)
                 {
-                    totalLikes += calculateStatusesScore(activityList, status);
+                    calculator.CalculateCommentsScore(link.Comments, commentScore);
+                    calculator.CalculateLikesScore(link.LikedBy, likeScore);
                 }
-                
-                foreach (KeyValuePair<string, double> userActivity in activityList)
+
+                foreach(Checkin checkin in checkins)
+                {
+                    calculator.CalculateTaggedUsersScores(checkin.WithUsers, taggedUsersScore);
+                }
+
+                foreach (KeyValuePair<string, double> userActivity in calculator.ActivityList)
                 {
                     ListViewItem item = new ListViewItem(userActivity.Key);
-                    item.SubItems.Add(string.Format("{0:0.00}%", (((userActivity.Value) / totalLikes) * 100)));
+                    item.SubItems.Add(string.Format("{0:0.00}%", (((userActivity.Value) / calculator.Total) * 100)));
                     listViewItems.Add(item);
                 }
 
                 listViewItems.Sort(new ListViewItemComparerDescending());
                 m_SynchronizationContext.Send(o =>
                 {
-                    listViewMostActiveFriends.Items.AddRange(listViewItems.ToArray());
+                    foreach (ListViewItem item in listViewItems)
+                    {
+                        listViewMostActiveFriends.Items.Add(item);
+                    }
                 }, null);
             });
         }
 
-        private double calculateStatusesScore(Dictionary<string, double> i_ActivityList, Status i_Status)
+        private IEnumerable<Post> fetchPosts()
         {
-            double result = 0;
+            var posts = m_LoggedInUser.Posts.Where(x => x.Description != null);
 
-            if (i_Status.From.Name != m_LoggedInUser.Name)
-            {
-                if (!i_ActivityList.ContainsKey(i_Status.From.Name))
-                {
-                    i_ActivityList.Add(i_Status.From.Name, 0);
-                }
-
-                i_ActivityList[i_Status.From.Name] += 3;
-                result += 3;
-            }
-
-            return result;
-        }
-
-        private double calculatePostFromUserScore(Dictionary<string, double> i_ActivityList, Post i_Post)
-        {
-            double result = 0;
-
-            if(i_Post.From.Name != m_LoggedInUser.Name)
-            {
-                if(!i_ActivityList.ContainsKey(i_Post.From.Name))
-                {
-                    i_ActivityList.Add(i_Post.From.Name, 0);
-                }
-
-                i_ActivityList[i_Post.From.Name]++;
-                result++;
-            }
-
-            return result;
-        }
-
-        private double calculatePostLikesScore(Dictionary<string, double> i_ActivityList, List<string> i_LikingUsers)
-        {
-            double result = 0;
-
-            foreach (string user in i_LikingUsers)
-            {
-                if (!i_ActivityList.ContainsKey(user))
-                {
-                    i_ActivityList.Add(user, 0);
-                }
-
-                i_ActivityList[user]++;
-                result++;
-            }
-
-            return result;
-        }
-
-        private double calculatePostTaggedScore(Dictionary<string, double> i_ActivityList, List<string> i_TaggedUsers)
-        {
-            double result = 0;
-
-            foreach (string user in i_TaggedUsers)
-            {
-                if (!i_ActivityList.ContainsKey(user))
-                {
-                    i_ActivityList.Add(user, 0);
-                }
-
-                i_ActivityList[user] += 5;
-                result += 5;
-            }
-
-            return result;
-        }
-
-        private double calculateCommentsScore(Dictionary<string, double> i_ActivityList, List<Comment> i_CommentList)
-        {
-            double result = 0;
-
-            foreach (Comment comment in i_CommentList)
-            {
-                List<Comment> innerList = comment.Comments.ToList();
-                
-                if (!i_ActivityList.ContainsKey(comment.From.Name))
-                {
-                    i_ActivityList.Add(comment.From.Name, 0);
-                }
-
-                i_ActivityList[comment.From.Name] += 2;
-                result += 2;
-                result += calculateCommentsLikesScore(i_ActivityList, comment);
-                if (innerList.Count > 0)
-                {
-                    result += calculateCommentsScore(i_ActivityList, innerList);
-                }
-            }
-
-            return result;
-        }
-
-        private double calculateCommentsLikesScore(Dictionary<string, double> i_ActivityList, Comment i_Comment)
-        {
-            double result = 0;
-
-            foreach(User user in i_Comment.LikedBy)
-            {
-                if (!i_ActivityList.ContainsKey(user.Name))
-                {
-                    i_ActivityList.Add(user.Name, 0);
-                }
-
-                i_ActivityList[user.Name]++;
-                result++;
-            }
-
-            return result;
-        }
-
-        private List<Post> fetchPosts()
-        {
-            List<Post> posts = m_LoggedInUser.Posts.Where(x => x.Description != null).ToList();
+            posts = posts.Concat(m_LoggedInUser.PostsTaggedIn.Where(x => x.Description != null)).Distinct();
 
             return posts;
         }
 
-        private Dictionary<Post, List<string>> fetchPostsTaggedUsers(List<Post> i_PostList)
+        private void buttonEvents_Click(object sender, EventArgs e)
         {
-            Dictionary<Post, List<string>> toReturn = new Dictionary<Post, List<string>>();
-
-            foreach(Post post in i_PostList)
-            {
-                toReturn[post] = post.TaggedUsers.Select(x => x.Name).ToList();
-            }
-
-            return toReturn;
-        }
-
-        private Dictionary<Post, List<Comment>> fetchPostsComments(List<Post> i_PostList)
-        {
-            Dictionary<Post, List<Comment>> toReturn = new Dictionary<Post, List<Comment>>();
-
-            foreach(Post post in i_PostList)
-            {
-                toReturn[post] = post.Comments.ToList();
-            }
-
-            return toReturn;
-        }
-
-        private Dictionary<Post, List<string>> fetchPostsLikedByUsers(List<Post> i_PostList)
-        {
-            Dictionary<Post, List<string>> toReturn = new Dictionary<Post, List<string>>();
-
-            foreach(Post post in i_PostList)
-            {
-                toReturn[post] = post.LikedBy.Select(x => x.Name).ToList();
-            }
-
-            return toReturn;
-        }
-
-        private void buttonGetPicturesWithFriend_Click(object sender, EventArgs e)
-        {
-            if(comboBoxChooseFriend.SelectedItem != null)
-            {
-                string friendName = comboBoxChooseFriend.SelectedItem.ToString();
-
-                listBoxPicturesWithFriend.Items.Clear();
-                Task.Factory.StartNew(() =>
-                {
-                    List<Photo> photos = fetchPhotos();
-                    Dictionary<Photo, List<PhotoTag>> photosTags = new Dictionary<Photo, List<PhotoTag>>();
-                    List<string> filteredPhotosNames = new List<string>();
-                    bool pictureWithFriend;
-
-                    foreach(Photo photo in photos)
-                    {
-                        if(photo.Tags != null)
-                        {
-                            photosTags.Add(photo, photo.Tags.ToList());
-                        }
-                    }
-
-                    foreach (KeyValuePair<Photo, List<PhotoTag>> photoAndTags in photosTags)
-                    {
-                        pictureWithFriend = false;
-                        foreach (var tag in photoAndTags.Value)
-                        {
-                            if (tag.User.Name == friendName)
-                            {
-                                pictureWithFriend = true;
-                                break;
-                            }
-                        }
-
-                        if (pictureWithFriend)
-                        {
-                            filteredPhotosNames.Add(photoAndTags.Key.Name);
-                        }
-                    }
-
-                    m_SynchronizationContext.Send(o =>
-                    {
-                        foreach (string photoName in filteredPhotosNames)
-                        {
-                            listBoxPicturesWithFriend.Items.Add(photoName);
-                        }
-                    }, null);
-                });
-            }
-            else
-            {
-                MessageBox.Show("Please choose a friend");
-            }
-        }
-
-        private List<Photo> fetchPhotos()
-        {
-            List<Photo> photos = new List<Photo>();
-
-            foreach (Album album in m_LoggedInUser.Albums)
-            {
-                photos.AddRange(album.Photos.ToList());
-            }
-
-            return photos;
-        }
-
-        private void listBoxPicturesWithFriend_MouseDoubleClick(object sender, MouseEventArgs e)
-        {
-            string photoName = listBoxPicturesWithFriend.SelectedItem.ToString();
-            Photo selectedPhoto = null;
             Task.Factory.StartNew(() =>
             {
-                List<Photo> photos = fetchPhotos();
+                List<Event> events = m_LoggedInUser.Events.ToList();
+                FormEvents form = new FormEvents(events);
 
-                foreach (Photo photo in photos)
+                form.ShowDialog();
+            });
+        }
+
+        private void buttonPost_Click(object sender, EventArgs e)
+        {
+            Task.Factory.StartNew(() =>
+            {
+                FormPost form = new FormPost(m_LoggedInUser);
+
+                form.ShowDialog();
+            });
+        }
+
+        private void buttonGetCheckins_Click(object sender, EventArgs e)
+        {
+            var selectedStringUsers = checkedListBoxUsers.CheckedItems;
+            FacebookObjectCollection<User> selectedUsers = new FacebookObjectCollection<User>();
+            CheckinIntersector checkinIntersector = new CheckinIntersector();
+
+            if (selectedStringUsers.Contains(m_LoggedInUser.Name))
+            {
+                selectedUsers.Add(m_LoggedInUser);
+            }
+
+            foreach (User friend in m_LoggedInUser.Friends)
+            {
+                if (selectedStringUsers.Contains(friend.Name))
                 {
-                    if (photo.Name == photoName)
-                    {
-                        selectedPhoto = photo;
-                        break;
-                    }
+                    selectedUsers.Add(friend);
+                }
+            }
+
+            Task.Factory.StartNew(() =>
+            {
+                var sharedCheckins = checkinIntersector.IntersectCheckins(selectedUsers);
+                gMapControlFriendCheckins.Overlays.Clear();
+                GMapOverlay markersOverlay = new GMapOverlay("markers");
+                foreach (Checkin checkin in sharedCheckins)
+                {
+                    Page place = checkin.Place;
+                    GMarkerGoogle marker = new GMarkerGoogle(new PointLatLng((double)place.Location.Latitude, (double)place.Location.Longitude), GMarkerGoogleType.red);
+                    markersOverlay.Markers.Add(marker);
                 }
 
-                m_SynchronizationContext.Send(o =>
-                {
-                    FormPictureWithFriend form = new FormPictureWithFriend(selectedPhoto);
-                    form.ShowDialog();
-                }, null);
+                gMapControlFriendCheckins.Overlays.Add(markersOverlay);
             });
+        }
+
+        private void buttonNameGenerator_Click(object sender, EventArgs e)
+        {
+            FormNameGames form = new FormNameGames(m_LoggedInUser);
+            form.ShowDialog();
         }
     }
 }
