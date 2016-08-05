@@ -22,9 +22,10 @@ namespace FacebookAppFirstStage
 
                         foreach (User innerSelectedUser in i_SelectedUsers)
                         {
-                            if (!checkin.WithUsers.Select(x => x.Name).Contains(innerSelectedUser.Name) && checkin.From.Name != innerSelectedUser.Name)
+                            if (!checkin.WithUsers.Select(x => x.Name).Contains(innerSelectedUser.Name) && checkin.From.Name != innerSelectedUser.Name && !checkin.TaggedUsers.Select(x => x.Name).Contains(innerSelectedUser.Name))
                             {
                                 isCheckinShared = false;
+                                break;
                             }
                         }
 

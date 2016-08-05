@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="FacebookAppFirstStage.AppSettings" Collapsed="true">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAgACAAgAAAAAIAAAAAEAAAAAAAAAAAAAAAEAA=</HashCode>
+      <FileName>AppSettings.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FacebookAppFirstStage.CheckinIntersector" Collapsed="true">
+    <Position X="2.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CheckinIntersector.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FacebookAppFirstStage.FacebookScoreCalculator" Collapsed="true">
+    <Position X="4" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAACAAAAAAAAAAAAAAAAAACBAAAQAACAAAAAAABAAI=</HashCode>
+      <FileName>FacebookScoreCalculator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FacebookAppFirstStage.FormDragonName" Collapsed="true">
+    <Position X="5.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQCAAAAQCEAAAAAgACAABACAAABAAAAAEAAAAAAAAA=</HashCode>
+      <FileName>FormDragonName.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FacebookAppFirstStage.FormEvents" Collapsed="true">
+    <Position X="0.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAACACACAAAAAACAAAACEAAAgAAAAAAAAAABAAQ=</HashCode>
+      <FileName>FormEvents.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FacebookAppFirstStage.FormMain" Collapsed="true">
+    <Position X="2.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IREZIPIAAGABQBKAgECIgAoyAGIARgAACAAQQQlAiEA=</HashCode>
+      <FileName>FormMain.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FacebookAppFirstStage.FormNameGames" Collapsed="true">
+    <Position X="4" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAAACgAACAAgAAAgASAAQYCAAQEgAAAAAQAAABFAAA=</HashCode>
+      <FileName>FormNameGames.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FacebookAppFirstStage.FormPost" Collapsed="true">
+    <Position X="5.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAgAAAgACAAAICAAAAgEAAAAAAAABFAAA=</HashCode>
+      <FileName>FormPost.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FacebookAppFirstStage.ListViewItemComparerDescending" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="0.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAA=</HashCode>
+      <FileName>ListViewItemComparer.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="FacebookAppFirstStage.NameGenerator" Collapsed="true">
+    <Position X="2.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAACAAAAAAAAAIAAAAAAgQAAAAEAAABAAAA=</HashCode>
+      <FileName>NameGenerator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FacebookAppFirstStage.Program" Collapsed="true">
+    <Position X="4" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAA=</HashCode>
+      <FileName>Program.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FacebookAppFirstStage.Properties.Resources" Collapsed="true">
+    <Position X="5.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAAAAAAAAAAABEAAAAQAAAAAAAAAAAAAAAIA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FacebookAppFirstStage.Properties.Settings" Collapsed="true">
+    <Position X="0.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAIAAAAAABAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
