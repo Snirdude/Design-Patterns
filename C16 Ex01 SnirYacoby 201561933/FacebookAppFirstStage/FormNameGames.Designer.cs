@@ -1,6 +1,6 @@
 ﻿namespace FacebookAppFirstStage
 {
-    partial class FormNameGames
+    internal partial class FormNameGames
     {
         /// <summary>
         /// Required designer variable.
@@ -17,6 +17,7 @@
             {
                 components.Dispose();
             }
+
             base.Dispose(disposing);
         }
 
@@ -94,7 +95,7 @@
             this.richTextBoxGeneration.Name = "richTextBoxGeneration";
             this.richTextBoxGeneration.Size = new System.Drawing.Size(188, 154);
             this.richTextBoxGeneration.TabIndex = 5;
-            this.richTextBoxGeneration.Text = "";
+            this.richTextBoxGeneration.Text = string.Empty;
             // 
             // buttonPost
             // 

@@ -1,6 +1,6 @@
 ﻿namespace FacebookAppFirstStage
 {
-    partial class FormDragonName
+    internal partial class FormDragonName
     {
         /// <summary>
         /// Required designer variable.
@@ -17,6 +17,7 @@
             {
                 components.Dispose();
             }
+
             base.Dispose(disposing);
         }
 

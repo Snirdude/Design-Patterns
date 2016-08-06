@@ -7,9 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Threading;
 using FacebookWrapper;
 using FacebookWrapper.ObjectModel;
-using System.Threading;
 using GMap.NET.WindowsForms;
 using GMap.NET;
 using GMap.NET.WindowsForms.Markers;
@@ -18,9 +18,8 @@ namespace FacebookAppFirstStage
 {
     public partial class FormMain : System.Windows.Forms.Form
     {
-        private User m_LoggedInUser;
+        private User m_LoggedInUser = null;
         private AppSettings m_AppSettings;
-        private Thread m_MainThread = Thread.CurrentThread;
         private SynchronizationContext m_SynchronizationContext;
 
         public FormMain()
@@ -74,15 +73,16 @@ namespace FacebookAppFirstStage
             {
                 List<string> friends = fetchFriendsNames();
 
-                m_SynchronizationContext.Send(o =>
+                m_SynchronizationContext.Send(
+                    o =>
                 {
                     checkedListBoxUsers.Items.Add(m_LoggedInUser.Name);
                     foreach (string friendName in friends)
                     {
                         checkedListBoxUsers.Items.Add(friendName);
                     }
-
-                }, null);
+                },
+                    null);
             });
 
             if (m_AppSettings.IsChecked)
@@ -141,70 +141,78 @@ namespace FacebookAppFirstStage
 
         private void buttonGetFriends_Click(object sender, EventArgs e)
         {
-            List<string> friendList = fetchFriendsNames();
-
-            listBoxFriends.Items.Clear();
-            foreach(string friend in friendList)
+            if(m_LoggedInUser != null)
             {
-                listBoxFriends.Items.Add(friend);
+                List<string> friendList = fetchFriendsNames();
+
+                listBoxFriends.Items.Clear();
+                foreach (string friend in friendList)
+                {
+                    listBoxFriends.Items.Add(friend);
+                }
             }
         }
 
         private void buttonGetFriendsByActivity_Click(object sender, EventArgs e)
         {
-            List<ListViewItem> listViewItems = new List<ListViewItem>();
-            listViewMostActiveFriends.Items.Clear();
-
-            Task.Factory.StartNew(() =>
+            if(m_LoggedInUser != null)
             {
-                IEnumerable<Post> postList = fetchPosts();
-                FacebookObjectCollection<Link> links = m_LoggedInUser.PostedLinks;
-                FacebookObjectCollection<Checkin> checkins = m_LoggedInUser.Checkins;
-                FacebookObjectCollection<Status> statuses = m_LoggedInUser.Statuses;
-                FacebookScoreCalculator calculator = new FacebookScoreCalculator(m_LoggedInUser.Name);
-                double postScore = (double)numericUpDownPostScore.Value;
-                double likeScore = (double)numericUpDownLikeScore.Value;
-                double commentScore = (double)numericUpDownCommentScore.Value;
-                double statusScore = (double)numericUpDownStatusScore.Value;
-                double taggedUsersScore = (double)numericUpDownTaggedUsersScore.Value;
+                List<ListViewItem> listViewItems = new List<ListViewItem>();
+                listViewMostActiveFriends.Items.Clear();
 
-                foreach (Post post in postList)
+                Task.Factory.StartNew(() =>
                 {
-                    calculator.CalculatePostFromUserScore(post, postScore);
-                    calculator.CalculateLikesScore(post.LikedBy, likeScore);
-                    calculator.CalculateCommentsScore(post.Comments, commentScore);
-                    calculator.CalculateTaggedUsersScores(post.WithUsers, taggedUsersScore);
-                }
+                    IEnumerable<Post> postList = fetchPosts();
+                    FacebookObjectCollection<Link> links = m_LoggedInUser.PostedLinks;
+                    FacebookObjectCollection<Checkin> checkins = m_LoggedInUser.Checkins;
+                    FacebookObjectCollection<Status> statuses = m_LoggedInUser.Statuses;
+                    FacebookScoreCalculator calculator = new FacebookScoreCalculator(m_LoggedInUser.Name);
+                    double postScore = (double)numericUpDownPostScore.Value;
+                    double likeScore = (double)numericUpDownLikeScore.Value;
+                    double commentScore = (double)numericUpDownCommentScore.Value;
+                    double statusScore = (double)numericUpDownStatusScore.Value;
+                    double taggedUsersScore = (double)numericUpDownTaggedUsersScore.Value;
 
-                calculator.CalculateStatusesScore(statuses, statusScore);
-
-                foreach(Link link in links)
-                {
-                    calculator.CalculateCommentsScore(link.Comments, commentScore);
-                    calculator.CalculateLikesScore(link.LikedBy, likeScore);
-                }
-
-                foreach(Checkin checkin in checkins)
-                {
-                    calculator.CalculateTaggedUsersScores(checkin.WithUsers, taggedUsersScore);
-                }
-
-                foreach (KeyValuePair<string, double> userActivity in calculator.ActivityList)
-                {
-                    ListViewItem item = new ListViewItem(userActivity.Key);
-                    item.SubItems.Add(string.Format("{0:0.00}%", (((userActivity.Value) / calculator.Total) * 100)));
-                    listViewItems.Add(item);
-                }
-
-                listViewItems.Sort(new ListViewItemComparerDescending());
-                m_SynchronizationContext.Send(o =>
-                {
-                    foreach (ListViewItem item in listViewItems)
+                    foreach (Post post in postList)
                     {
-                        listViewMostActiveFriends.Items.Add(item);
+                        calculator.CalculatePostFromUserScore(post, postScore);
+                        calculator.CalculateLikesScore(post.LikedBy, likeScore);
+                        calculator.CalculateCommentsScore(post.Comments, commentScore);
+                        calculator.CalculateTaggedUsersScores(post.WithUsers, taggedUsersScore);
                     }
-                }, null);
-            });
+
+                    calculator.CalculateStatusesScore(statuses, statusScore);
+
+                    foreach (Link link in links)
+                    {
+                        calculator.CalculateCommentsScore(link.Comments, commentScore);
+                        calculator.CalculateLikesScore(link.LikedBy, likeScore);
+                    }
+
+                    foreach (Checkin checkin in checkins)
+                    {
+                        calculator.CalculateTaggedUsersScores(checkin.WithUsers, taggedUsersScore);
+                    }
+
+                    foreach (KeyValuePair<string, double> userActivity in calculator.ActivityList)
+                    {
+                        ListViewItem item = new ListViewItem(userActivity.Key);
+                        item.SubItems.Add(string.Format("{0:0.00}%", (userActivity.Value / calculator.Total) * 100));
+                        listViewItems.Add(item);
+                    }
+
+                    listViewItems.Sort(new ListViewItemComparerDescending());
+                    m_SynchronizationContext.Send(
+                        o =>
+                        {
+                            foreach (ListViewItem item in listViewItems)
+                            {
+                                listViewMostActiveFriends.Items.Add(item);
+                            }
+                        },
+                        null);
+                });
+            }
         }
 
         private IEnumerable<Post> fetchPosts()
@@ -218,64 +226,75 @@ namespace FacebookAppFirstStage
 
         private void buttonEvents_Click(object sender, EventArgs e)
         {
-            Task.Factory.StartNew(() =>
+            if(m_LoggedInUser != null)
             {
-                List<Event> events = m_LoggedInUser.Events.ToList();
-                FormEvents form = new FormEvents(events);
+                Task.Factory.StartNew(() =>
+                {
+                    FormEvents form = new FormEvents(m_LoggedInUser.Events);
 
-                form.ShowDialog();
-            });
+                    form.ShowDialog();
+                });
+            }
         }
 
         private void buttonPost_Click(object sender, EventArgs e)
         {
-            Task.Factory.StartNew(() =>
+            if(m_LoggedInUser != null)
             {
-                FormPost form = new FormPost(m_LoggedInUser);
+                Task.Factory.StartNew(() =>
+                {
+                    FormPost form = new FormPost(m_LoggedInUser);
 
-                form.ShowDialog();
-            });
+                    form.ShowDialog();
+                });
+            }
         }
 
         private void buttonGetCheckins_Click(object sender, EventArgs e)
         {
-            var selectedStringUsers = checkedListBoxUsers.CheckedItems;
-            FacebookObjectCollection<User> selectedUsers = new FacebookObjectCollection<User>();
-            CheckinIntersector checkinIntersector = new CheckinIntersector();
-
-            if (selectedStringUsers.Contains(m_LoggedInUser.Name))
+            if(m_LoggedInUser != null)
             {
-                selectedUsers.Add(m_LoggedInUser);
-            }
+                var selectedStringUsers = checkedListBoxUsers.CheckedItems;
+                FacebookObjectCollection<User> selectedUsers = new FacebookObjectCollection<User>();
+                CheckinIntersector checkinIntersector = new CheckinIntersector();
 
-            foreach (User friend in m_LoggedInUser.Friends)
-            {
-                if (selectedStringUsers.Contains(friend.Name))
+                if (selectedStringUsers.Contains(m_LoggedInUser.Name))
                 {
-                    selectedUsers.Add(friend);
-                }
-            }
-
-            Task.Factory.StartNew(() =>
-            {
-                var sharedCheckins = checkinIntersector.IntersectCheckins(selectedUsers);
-                gMapControlFriendCheckins.Overlays.Clear();
-                GMapOverlay markersOverlay = new GMapOverlay("markers");
-                foreach (Checkin checkin in sharedCheckins)
-                {
-                    Page place = checkin.Place;
-                    GMarkerGoogle marker = new GMarkerGoogle(new PointLatLng((double)place.Location.Latitude, (double)place.Location.Longitude), GMarkerGoogleType.red);
-                    markersOverlay.Markers.Add(marker);
+                    selectedUsers.Add(m_LoggedInUser);
                 }
 
-                gMapControlFriendCheckins.Overlays.Add(markersOverlay);
-            });
+                foreach (User friend in m_LoggedInUser.Friends)
+                {
+                    if (selectedStringUsers.Contains(friend.Name))
+                    {
+                        selectedUsers.Add(friend);
+                    }
+                }
+
+                Task.Factory.StartNew(() =>
+                {
+                    var sharedCheckins = checkinIntersector.IntersectCheckins(selectedUsers);
+                    gMapControlFriendCheckins.Overlays.Clear();
+                    GMapOverlay markersOverlay = new GMapOverlay("markers");
+                    foreach (Checkin checkin in sharedCheckins)
+                    {
+                        Page place = checkin.Place;
+                        GMarkerGoogle marker = new GMarkerGoogle(new PointLatLng((double)place.Location.Latitude, (double)place.Location.Longitude), GMarkerGoogleType.red);
+                        markersOverlay.Markers.Add(marker);
+                    }
+
+                    gMapControlFriendCheckins.Overlays.Add(markersOverlay);
+                });
+            }
         }
 
         private void buttonNameGenerator_Click(object sender, EventArgs e)
         {
-            FormNameGames form = new FormNameGames(m_LoggedInUser);
-            form.ShowDialog();
+            if(m_LoggedInUser != null)
+            {
+                FormNameGames nameGamesForm = new FormNameGames(m_LoggedInUser);
+                nameGamesForm.ShowDialog();
+            }
         }
     }
 }

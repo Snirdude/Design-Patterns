@@ -5,7 +5,7 @@ using System.Text;
 
 namespace FacebookAppFirstStage
 {
-    class NameGenerator
+    internal class NameGenerator
     {
         private string m_FirstName;
         private string m_LastName;
@@ -21,7 +21,7 @@ namespace FacebookAppFirstStage
             StringBuilder name = new StringBuilder();
 
             name.Append(m_FirstName.Substring(m_FirstName.Length - 2, 1).ToUpper() + m_FirstName.Substring(m_FirstName.Length - 1));
-            name.Append(m_LastName.Substring((m_LastName.Length / 2), 2));
+            name.Append(m_LastName.Substring(m_LastName.Length / 2, 2));
             name.Append(i_MotherName.Substring(0, 2).ToLower());
             name.Append(i_FatherName.Substring(i_FatherName.Length - 1));
 

@@ -9,9 +9,10 @@ using System.Windows.Forms;
 
 namespace FacebookAppFirstStage
 {
-    public partial class FormDragonName : Form
+    internal partial class FormDragonName : Form
     {
         public string FatherName { get; private set; }
+
         public string MotherName { get; private set; }
 
         public FormDragonName()

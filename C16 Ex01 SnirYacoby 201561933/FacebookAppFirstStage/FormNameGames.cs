@@ -1,5 +1,4 @@
-﻿using FacebookWrapper.ObjectModel;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -7,11 +6,11 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
+using FacebookWrapper.ObjectModel;
 
 namespace FacebookAppFirstStage
 {
-    public partial class FormNameGames : Form
+    internal partial class FormNameGames : Form
     {
         private User m_LoggedInUser;
         private NameGenerator m_NameGenerator;

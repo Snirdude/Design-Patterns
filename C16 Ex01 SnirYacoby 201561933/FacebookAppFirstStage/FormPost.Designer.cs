@@ -1,6 +1,6 @@
 ﻿namespace FacebookAppFirstStage
 {
-    partial class FormPost
+    internal partial class FormPost
     {
         /// <summary>
         /// Required designer variable.
@@ -17,6 +17,7 @@
             {
                 components.Dispose();
             }
+
             base.Dispose(disposing);
         }
 
@@ -40,7 +41,7 @@
             this.richTextBoxPost.Name = "richTextBoxPost";
             this.richTextBoxPost.Size = new System.Drawing.Size(259, 160);
             this.richTextBoxPost.TabIndex = 0;
-            this.richTextBoxPost.Text = "";
+            this.richTextBoxPost.Text = string.Empty;
             // 
             // buttonPost
             // 

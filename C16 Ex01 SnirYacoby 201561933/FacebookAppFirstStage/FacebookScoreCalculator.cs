@@ -1,12 +1,12 @@
-﻿using FacebookWrapper.ObjectModel;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using FacebookWrapper.ObjectModel;
 
 namespace FacebookAppFirstStage
 {
-    class FacebookScoreCalculator
+    internal class FacebookScoreCalculator
     {
         private string m_LoggedInUserName;
 

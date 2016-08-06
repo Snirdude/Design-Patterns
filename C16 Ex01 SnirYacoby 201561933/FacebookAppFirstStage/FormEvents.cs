@@ -1,5 +1,4 @@
-﻿using FacebookWrapper.ObjectModel;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -7,14 +6,15 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using FacebookWrapper.ObjectModel;
 
 namespace FacebookAppFirstStage
 {
     public partial class FormEvents : Form
     {
-        private List<Event> m_Events;
+        private FacebookObjectCollection<Event> m_Events;
 
-        public FormEvents(List<Event> i_Events)
+        public FormEvents(FacebookObjectCollection<Event> i_Events)
         {
             InitializeComponent();
             m_Events = i_Events;
@@ -39,6 +39,15 @@ namespace FacebookAppFirstStage
                     selectedEvent = @event;
                     break;
                 }
+            }
+
+            if(selectedEvent.Description != null)
+            {
+                richTextBoxDescription.Text = selectedEvent.Description;
+            }
+            else
+            {
+                richTextBoxDescription.Text = string.Empty;
             }
 
             try

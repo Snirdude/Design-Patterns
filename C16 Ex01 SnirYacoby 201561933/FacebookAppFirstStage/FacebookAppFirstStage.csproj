@@ -93,7 +93,7 @@
     <Compile Include="FormPost.Designer.cs">
       <DependentUpon>FormPost.cs</DependentUpon>
     </Compile>
-    <Compile Include="ListViewItemComparer.cs" />
+    <Compile Include="ListViewItemComparerDescending.cs" />
     <Compile Include="NameGenerator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

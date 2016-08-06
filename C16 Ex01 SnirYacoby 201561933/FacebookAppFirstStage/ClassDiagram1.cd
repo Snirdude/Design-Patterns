@@ -31,7 +31,7 @@
   <Class Name="FacebookAppFirstStage.FormEvents" Collapsed="true">
     <Position X="0.5" Y="1.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAACACACAAAAAACAAAACEAAAgAAAAAAAAAABAAQ=</HashCode>
+      <HashCode>AAAAAQACACACAAAEAACAAAACEAAAgAAAAAAAAAABAAQ=</HashCode>
       <FileName>FormEvents.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -60,7 +60,7 @@
     <Position X="0.5" Y="2.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAA=</HashCode>
-      <FileName>ListViewItemComparer.cs</FileName>
+      <FileName>ListViewItemComparerDescending.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>

@@ -11,9 +11,31 @@ namespace FacebookAppFirstStage
     public class AppSettings
     {
         public string AccessToken { get; set; }
+
         public bool IsChecked { get; set; }
+
         public Size Size { get; set; }
+
         public Point Location { get; set; }
+        
+        public static AppSettings LoadFromFile()
+        {
+            AppSettings settings = null;
+            if (File.Exists("AppSettings.xml"))
+            {
+                using (Stream stream = new FileStream("AppSettings.xml", FileMode.Open))
+                {
+                    XmlSerializer serialzer = new XmlSerializer(typeof(AppSettings));
+                    settings = serialzer.Deserialize(stream) as AppSettings;
+                }
+            }
+            else
+            {
+                settings = new AppSettings();
+            }
+
+            return settings;
+        }
 
         public void SaveToFile()
         {
@@ -33,25 +55,6 @@ namespace FacebookAppFirstStage
                     serializer.Serialize(stream, this);
                 }
             }
-        }
-
-        public static AppSettings LoadFromFile()
-        {
-            AppSettings settings = null;
-            if(File.Exists("AppSettings.xml"))
-            {
-                using (Stream stream = new FileStream("AppSettings.xml", FileMode.Open))
-                {
-                    XmlSerializer serialzer = new XmlSerializer(typeof(AppSettings));
-                    settings = serialzer.Deserialize(stream) as AppSettings;
-                }
-            }
-            else
-            {
-                settings = new AppSettings();
-            }
-
-            return settings;
         }
     }
 }
