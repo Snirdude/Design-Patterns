@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FacebookAppFirstStage", "FacebookAppFirstStage\FacebookAppFirstStage.csproj", "{0BF7A922-426D-4A68-879B-7CF9417F87B9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FacebookApp", "FacebookAppFirstStage\FacebookApp.csproj", "{0BF7A922-426D-4A68-879B-7CF9417F87B9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CBC6DAAF-FEB7-4B53-983A-1D1C1579F7A3}"
 	ProjectSection(SolutionItems) = preProject

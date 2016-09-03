@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace FacebookAppFirstStage.Properties {
+namespace FacebookApp.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace FacebookAppFirstStage.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FacebookAppFirstStage.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FacebookApp.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -65,7 +65,7 @@ namespace FacebookAppFirstStage.Properties {
         /// </summary>
         internal static System.Drawing.Bitmap Facebook_create {
             get {
-                object obj = ResourceManager.GetObject("Facebook-create", resourceCulture);
+                object obj = ResourceManager.GetObject("Facebook_create", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
