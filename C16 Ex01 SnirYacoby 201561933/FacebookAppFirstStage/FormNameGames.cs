@@ -13,58 +13,37 @@ namespace FacebookAppFirstStage
     internal partial class FormNameGames : Form
     {
         private User m_LoggedInUser;
-        private NameGenerator m_NameGenerator;
 
         public FormNameGames(User i_LoggedInUser)
         {
             InitializeComponent();
             m_LoggedInUser = i_LoggedInUser;
-            m_NameGenerator = new NameGenerator(m_LoggedInUser.FirstName, m_LoggedInUser.LastName);
         }
 
-        private void buttonDragonName_Click(object sender, EventArgs e)
+        private void doWhenNameGeneratorButtonClicked(eNameGenerator i_TypeOfName)
         {
-            FormDragonName dragonNameForm = new FormDragonName();
             StringBuilder sb = new StringBuilder();
+            INameGenerator nameGenerator = NameGeneratorFactory.CreateNameGenerator(i_TypeOfName);
 
-            dragonNameForm.ShowDialog();
-            if (dragonNameForm.DialogResult == DialogResult.OK)
-            {
-                sb.Append(string.Format("Your dragon name is: {0}{0}", Environment.NewLine));
-                sb.Append(m_NameGenerator.GenerateDragonName(dragonNameForm.FatherName, dragonNameForm.MotherName));
-                richTextBoxGeneration.Clear();
-                richTextBoxGeneration.Text = sb.ToString();
-            }
+            sb.Append(string.Format("Your {1} name is: {0}{0}", Environment.NewLine, Enum.GetName(typeof(eNameGenerator), i_TypeOfName)));
+            sb.Append(nameGenerator.GenerateName(m_LoggedInUser.FirstName, m_LoggedInUser.LastName));
+            richTextBoxGeneration.Clear();
+            richTextBoxGeneration.Text = sb.ToString();
         }
 
         private void buttonJapaneseName_Click(object sender, EventArgs e)
         {
-            StringBuilder sb = new StringBuilder();
-
-            sb.Append(string.Format("Your Japanese name is: {0}{0}", Environment.NewLine));
-            sb.Append(m_NameGenerator.GenerateJapaneseName());
-            richTextBoxGeneration.Clear();
-            richTextBoxGeneration.Text = sb.ToString();
+            doWhenNameGeneratorButtonClicked(eNameGenerator.Japanese);
         }
 
         private void buttonSuperheroName_Click(object sender, EventArgs e)
         {
-            StringBuilder sb = new StringBuilder();
-
-            sb.Append(string.Format("Your superhero name is: {0}{0}", Environment.NewLine));
-            sb.Append(m_NameGenerator.GenerateSuperheroName());
-            richTextBoxGeneration.Clear();
-            richTextBoxGeneration.Text = sb.ToString();
+            doWhenNameGeneratorButtonClicked(eNameGenerator.Superhero);
         }
 
         private void buttonWerewolfName_Click(object sender, EventArgs e)
         {
-            StringBuilder sb = new StringBuilder();
-
-            sb.Append(string.Format("Your werewolf name is: {0}{0}", Environment.NewLine));
-            sb.Append(m_NameGenerator.GenerateWerewolfName());
-            richTextBoxGeneration.Clear();
-            richTextBoxGeneration.Text = sb.ToString();
+            doWhenNameGeneratorButtonClicked(eNameGenerator.Werewolf);
         }
 
         private void buttonPost_Click(object sender, EventArgs e)
@@ -85,6 +64,11 @@ namespace FacebookAppFirstStage
         private void buttonClose_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void buttonBandName_Click(object sender, EventArgs e)
+        {
+            doWhenNameGeneratorButtonClicked(eNameGenerator.HeavyMetalBand);
         }
     }
 }

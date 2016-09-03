@@ -20,11 +20,9 @@ namespace FacebookAppFirstStage
     {
         private User m_LoggedInUser = null;
         private AppSettings m_AppSettings;
-        private SynchronizationContext m_SynchronizationContext;
 
         public FormMain()
         {
-            m_SynchronizationContext = SynchronizationContext.Current;
             InitializeComponent();
         }
 
@@ -73,16 +71,14 @@ namespace FacebookAppFirstStage
             {
                 List<string> friends = fetchFriendsNames();
 
-                m_SynchronizationContext.Send(
-                    o =>
+                checkedListBoxUsers.Invoke(new Action(() => 
                 {
                     checkedListBoxUsers.Items.Add(m_LoggedInUser.Name);
                     foreach (string friendName in friends)
                     {
                         checkedListBoxUsers.Items.Add(friendName);
                     }
-                },
-                    null);
+                }));
             });
 
             if (m_AppSettings.IsChecked)
@@ -162,37 +158,15 @@ namespace FacebookAppFirstStage
 
                 Task.Factory.StartNew(() =>
                 {
-                    IEnumerable<Post> postList = fetchPosts();
-                    FacebookObjectCollection<Link> links = m_LoggedInUser.PostedLinks;
-                    FacebookObjectCollection<Checkin> checkins = m_LoggedInUser.Checkins;
-                    FacebookObjectCollection<Status> statuses = m_LoggedInUser.Statuses;
-                    FacebookScoreCalculator calculator = new FacebookScoreCalculator(m_LoggedInUser.Name);
+                    FacebookScoreCalculator calculator = new FacebookScoreCalculator(m_LoggedInUser);
+
                     double postScore = (double)numericUpDownPostScore.Value;
                     double likeScore = (double)numericUpDownLikeScore.Value;
                     double commentScore = (double)numericUpDownCommentScore.Value;
                     double statusScore = (double)numericUpDownStatusScore.Value;
                     double taggedUsersScore = (double)numericUpDownTaggedUsersScore.Value;
 
-                    foreach (Post post in postList)
-                    {
-                        calculator.CalculatePostFromUserScore(post, postScore);
-                        calculator.CalculateLikesScore(post.LikedBy, likeScore);
-                        calculator.CalculateCommentsScore(post.Comments, commentScore);
-                        calculator.CalculateTaggedUsersScores(post.WithUsers, taggedUsersScore);
-                    }
-
-                    calculator.CalculateStatusesScore(statuses, statusScore);
-
-                    foreach (Link link in links)
-                    {
-                        calculator.CalculateCommentsScore(link.Comments, commentScore);
-                        calculator.CalculateLikesScore(link.LikedBy, likeScore);
-                    }
-
-                    foreach (Checkin checkin in checkins)
-                    {
-                        calculator.CalculateTaggedUsersScores(checkin.WithUsers, taggedUsersScore);
-                    }
+                    calculator.CalculateScore(taggedUsersScore, statusScore, postScore, likeScore, commentScore);
 
                     foreach (KeyValuePair<string, double> userActivity in calculator.ActivityList)
                     {
@@ -202,26 +176,15 @@ namespace FacebookAppFirstStage
                     }
 
                     listViewItems.Sort(new ListViewItemComparerDescending());
-                    m_SynchronizationContext.Send(
-                        o =>
+                    listViewMostActiveFriends.Invoke(new Action(() =>
+                    {
+                        foreach (ListViewItem item in listViewItems)
                         {
-                            foreach (ListViewItem item in listViewItems)
-                            {
-                                listViewMostActiveFriends.Items.Add(item);
-                            }
-                        },
-                        null);
+                            listViewMostActiveFriends.Items.Add(item);
+                        }
+                    }));
                 });
             }
-        }
-
-        private IEnumerable<Post> fetchPosts()
-        {
-            var posts = m_LoggedInUser.Posts.Where(x => x.Description != null);
-
-            posts = posts.Concat(m_LoggedInUser.PostsTaggedIn.Where(x => x.Description != null)).Distinct();
-
-            return posts;
         }
 
         private void buttonEvents_Click(object sender, EventArgs e)
@@ -256,7 +219,7 @@ namespace FacebookAppFirstStage
             {
                 var selectedStringUsers = checkedListBoxUsers.CheckedItems;
                 FacebookObjectCollection<User> selectedUsers = new FacebookObjectCollection<User>();
-                CheckinIntersector checkinIntersector = new CheckinIntersector();
+                CheckinIntersector checkinIntersector = CheckinIntersector.GetInstance();
 
                 if (selectedStringUsers.Contains(m_LoggedInUser.Name))
                 {

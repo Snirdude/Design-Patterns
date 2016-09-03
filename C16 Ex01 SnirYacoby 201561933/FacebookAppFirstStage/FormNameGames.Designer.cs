@@ -29,7 +29,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.buttonDragonName = new System.Windows.Forms.Button();
+            this.buttonBandName = new System.Windows.Forms.Button();
             this.buttonJapaneseName = new System.Windows.Forms.Button();
             this.buttonSuperheroName = new System.Windows.Forms.Button();
             this.buttonWerewolfName = new System.Windows.Forms.Button();
@@ -39,15 +39,15 @@
             this.buttonClear = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
-            // buttonDragonName
+            // buttonBandName
             // 
-            this.buttonDragonName.Location = new System.Drawing.Point(13, 13);
-            this.buttonDragonName.Name = "buttonDragonName";
-            this.buttonDragonName.Size = new System.Drawing.Size(141, 34);
-            this.buttonDragonName.TabIndex = 0;
-            this.buttonDragonName.Text = "My Dragon Name";
-            this.buttonDragonName.UseVisualStyleBackColor = true;
-            this.buttonDragonName.Click += new System.EventHandler(this.buttonDragonName_Click);
+            this.buttonBandName.Location = new System.Drawing.Point(13, 13);
+            this.buttonBandName.Name = "buttonBandName";
+            this.buttonBandName.Size = new System.Drawing.Size(141, 34);
+            this.buttonBandName.TabIndex = 0;
+            this.buttonBandName.Text = "My Heavy Metal Band Name";
+            this.buttonBandName.UseVisualStyleBackColor = true;
+            this.buttonBandName.Click += new System.EventHandler(this.buttonBandName_Click);
             // 
             // buttonJapaneseName
             // 
@@ -93,9 +93,10 @@
             // 
             this.richTextBoxGeneration.Location = new System.Drawing.Point(161, 13);
             this.richTextBoxGeneration.Name = "richTextBoxGeneration";
+            this.richTextBoxGeneration.ReadOnly = true;
             this.richTextBoxGeneration.Size = new System.Drawing.Size(188, 154);
             this.richTextBoxGeneration.TabIndex = 5;
-            this.richTextBoxGeneration.Text = string.Empty;
+            this.richTextBoxGeneration.Text = "";
             // 
             // buttonPost
             // 
@@ -129,7 +130,7 @@
             this.Controls.Add(this.buttonWerewolfName);
             this.Controls.Add(this.buttonSuperheroName);
             this.Controls.Add(this.buttonJapaneseName);
-            this.Controls.Add(this.buttonDragonName);
+            this.Controls.Add(this.buttonBandName);
             this.Name = "FormNameGames";
             this.Text = "FormMiniGames";
             this.ResumeLayout(false);
@@ -138,7 +139,7 @@
 
         #endregion
 
-        private System.Windows.Forms.Button buttonDragonName;
+        private System.Windows.Forms.Button buttonBandName;
         private System.Windows.Forms.Button buttonJapaneseName;
         private System.Windows.Forms.Button buttonSuperheroName;
         private System.Windows.Forms.Button buttonWerewolfName;

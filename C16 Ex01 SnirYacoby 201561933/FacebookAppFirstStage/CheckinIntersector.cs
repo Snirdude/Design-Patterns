@@ -8,6 +8,20 @@ namespace FacebookAppFirstStage
 {
     internal class CheckinIntersector
     {
+        private static CheckinIntersector s_Instance = null;
+
+        private CheckinIntersector() {}
+
+        public static CheckinIntersector GetInstance()
+        {
+            if(s_Instance == null)
+            {
+                s_Instance = new CheckinIntersector();
+            }
+
+            return s_Instance;
+        }
+
         public IEnumerable<Checkin> IntersectCheckins(FacebookObjectCollection<User> i_SelectedUsers)
         {
             FacebookObjectCollection<Checkin> sharedCheckins = new FacebookObjectCollection<Checkin>();
