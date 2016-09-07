@@ -10,7 +10,9 @@ namespace FacebookAppFirstStage
     {
         private static CheckinIntersector s_Instance = null;
 
-        private CheckinIntersector() {}
+        private CheckinIntersector()
+        {
+        }
 
         public static CheckinIntersector GetInstance()
         {
@@ -36,7 +38,7 @@ namespace FacebookAppFirstStage
 
                         foreach (User innerSelectedUser in i_SelectedUsers)
                         {
-                            if (!checkin.WithUsers.Select(x => x.Name).Contains(innerSelectedUser.Name) && checkin.From.Name != innerSelectedUser.Name && !checkin.TaggedUsers.Select(x => x.Name).Contains(innerSelectedUser.Name))
+                            if (!checkin.WithUsers.Select(x => x.Name).Contains(innerSelectedUser.Name) && checkin.From.Name != innerSelectedUser.Name)
                             {
                                 isCheckinShared = false;
                                 break;

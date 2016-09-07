@@ -96,7 +96,7 @@
             this.richTextBoxGeneration.ReadOnly = true;
             this.richTextBoxGeneration.Size = new System.Drawing.Size(188, 154);
             this.richTextBoxGeneration.TabIndex = 5;
-            this.richTextBoxGeneration.Text = "";
+            this.richTextBoxGeneration.Text = string.Empty;
             // 
             // buttonPost
             // 
